@@ -22,6 +22,7 @@ use ocl::{ProQue, Result};
 
 // SIMT - Single Instruction Multiple Thread
 //   similar to SIMD, but load/stores are different
+//   you only declare "float",but behind the scenes it's <float32>
 //   load stores are implicit scatter gather, whereas on SIMD it's explicit
 
 //SIMD(AVX2/FMA) --> 256 bit vector registers, 8 floats per register
@@ -29,6 +30,7 @@ use ocl::{ProQue, Result};
 
 //SIMT (SIMD on GPU) --> 32 threads per warp, each thread has its own registers, but they execute the same instruction on different data
 //SIMT(WARP,threads) --->GPU backend 
+
 
 //CPU optimization:vector (AVX2) + cache reuse
 //GPU optimization:threads + memory coalescing + shared memory
@@ -38,6 +40,8 @@ use ocl::{ProQue, Result};
 // Each AVX2 FMA processes 8 floats → 8 mul + 8 add = 16 FLOPs
 // => Peak: 16 FLOPs per cycle per core (if pipeline is fully utilized)
 
+// FMA latency = 5 cycles → need ~10 independent ops to keep pipeline full (ILP)
+// Avoid dependencies so CPU can execute in parallel
 
 
 fn main() -> Result<()> {
